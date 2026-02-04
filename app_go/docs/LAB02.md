@@ -51,7 +51,7 @@ curl http://localhost:8080/
 curl http://localhost:8080/health
 ```
 
-Paste a short sample of the output here for the lab submission.
+![healthcheck](./screenshots/multistage-healthcheck.png)
 
 ## 5. Stage-by-Stage Explanation
 
