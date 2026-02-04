@@ -72,3 +72,10 @@ Example:
 HOST=127.0.0.1 PORT=3000 DEBUG=true python app_python/app.py
 ```
 
+## Docker
+
+**Build:** From `app_python/`, run `docker build -t <image-name> .`
+
+**Run:** `docker run -p <host-port>:5000 <image-name>` (app listens on 5000 inside container)
+
+**Pull from Docker Hub:** `docker pull <your-dockerhub-username>/<repo-name>:<tag>` then run as above.
