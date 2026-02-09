@@ -72,8 +72,8 @@ jobs:
             p/python
             p/docker
             p/ci
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+          # Run locally without Semgrep Cloud (no token needed)
+          # Remove or set SEMGREP_APP_TOKEN to use Semgrep Cloud dashboard
 
   docker:
     name: Build & Push Docker Image

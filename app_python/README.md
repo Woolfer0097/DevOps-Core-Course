@@ -124,8 +124,13 @@ This project uses GitHub Actions for continuous integration and deployment:
 
 - **Automated Testing:** Runs pytest with coverage on every push/PR
 - **Code Quality:** Ruff linter enforces Python best practices
-- **Security Scanning:** Semgrep checks for vulnerabilities
+- **Security Scanning:** Semgrep checks for vulnerabilities (no cloud account required)
 - **Docker Builds:** Multi-platform images (amd64/arm64) built and pushed to Docker Hub
 - **Versioning:** Calendar versioning (YYYY.MM.DD) for clear deployment tracking
 
 See [LAB03.md](docs/LAB03.md) for detailed CI/CD documentation.
+
+**Required Secrets for CI:**
+- `DOCKER_USERNAME` - Docker Hub username
+- `DOCKER_PASSWORD` - Docker Hub access token
+- `CODECOV_TOKEN` - (Optional) Codecov token for coverage reports

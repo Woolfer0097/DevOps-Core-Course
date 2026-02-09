@@ -45,7 +45,7 @@ ruff check .
 The GitHub Actions workflow (`.github/workflows/python-ci.yml`) runs:
 
 1. **Test Job** - Linting + Testing with coverage upload
-2. **Security Job** - Semgrep security scanning
+2. **Security Job** - Semgrep security scanning (no cloud token required)
 3. **Docker Job** - Multi-platform Docker build/push (depends on test + security)
 
 **Key Features:**
@@ -53,4 +53,9 @@ The GitHub Actions workflow (`.github/workflows/python-ci.yml`) runs:
 - Path filters (only runs on Python app changes)
 - Docker layer caching for faster builds
 - Multi-platform images (amd64/arm64)
-- Semgrep instead of Snyk for security scanning
+- Semgrep instead of Snyk for security scanning (runs locally, no account needed)
+
+**Required GitHub Secrets:**
+- `DOCKER_USERNAME` - Docker Hub username
+- `DOCKER_PASSWORD` - Docker Hub access token
+- `CODECOV_TOKEN` - (Optional) For coverage reporting
