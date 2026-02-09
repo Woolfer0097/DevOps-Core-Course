@@ -1,3 +1,8 @@
+# DevOps Info Service (Python)
+
+![Python CI](https://github.com/woolfer0097/DevOps-Core-Course/workflows/Python%20CI/badge.svg)
+[![codecov](https://codecov.io/gh/woolfer0097/DevOps-Core-Course/branch/main/graph/badge.svg)](https://codecov.io/gh/woolfer0097/DevOps-Core-Course)
+
 ## Overview
 
 The **DevOps Info Service** is a small FastAPI web application that exposes
@@ -72,6 +77,39 @@ Example:
 HOST=127.0.0.1 PORT=3000 DEBUG=true python app_python/app.py
 ```
 
+## Testing
+
+The project uses **pytest** for unit testing with coverage tracking.
+
+**Install development dependencies:**
+
+```bash
+pip install -r app_python/requirements-dev.txt
+```
+
+**Run all tests:**
+
+```bash
+cd app_python
+pytest
+```
+
+**Run tests with coverage report:**
+
+```bash
+cd app_python
+pytest --cov=. --cov-report=term-missing
+```
+
+**Run linter:**
+
+```bash
+cd app_python
+ruff check .
+```
+
+**Test Coverage:** The project maintains >80% test coverage with comprehensive tests for all endpoints, error handling, and helper functions.
+
 ## Docker
 
 **Build:** From `app_python/`, run `docker build -t <image-name> .`
@@ -79,3 +117,15 @@ HOST=127.0.0.1 PORT=3000 DEBUG=true python app_python/app.py
 **Run:** `docker run -p <host-port>:5000 <image-name>` (app listens on 5000 inside container)
 
 **Pull from Docker Hub:** `docker pull <your-dockerhub-username>/<repo-name>:<tag>` then run as above.
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+- **Automated Testing:** Runs pytest with coverage on every push/PR
+- **Code Quality:** Ruff linter enforces Python best practices
+- **Security Scanning:** Semgrep checks for vulnerabilities
+- **Docker Builds:** Multi-platform images (amd64/arm64) built and pushed to Docker Hub
+- **Versioning:** Calendar versioning (YYYY.MM.DD) for clear deployment tracking
+
+See [LAB03.md](docs/LAB03.md) for detailed CI/CD documentation.
