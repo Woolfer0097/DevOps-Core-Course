@@ -8,14 +8,13 @@ import logging
 import os
 import platform
 import socket
-from datetime import datetime, timezone
-from typing import Any, Dict, List
+from datetime import UTC, datetime
+from typing import Any
 
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-
 
 # Configuration
 HOST: str = os.getenv("HOST", "0.0.0.0")
@@ -32,13 +31,13 @@ logger = logging.getLogger(__name__)
 
 
 # Application start time for uptime calculations
-START_TIME = datetime.now(timezone.utc)
+START_TIME = datetime.now(UTC)
 
 
 app = FastAPI(title="DevOps Info Service")
 
 
-def get_system_info() -> Dict[str, Any]:
+def get_system_info() -> dict[str, Any]:
     """Collect system information."""
     return {
         "hostname": socket.gethostname(),
@@ -50,9 +49,9 @@ def get_system_info() -> Dict[str, Any]:
     }
 
 
-def get_runtime_info() -> Dict[str, Any]:
+def get_runtime_info() -> dict[str, Any]:
     """Calculate runtime information including uptime and current time."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     delta = now - START_TIME
     seconds = int(delta.total_seconds())
     hours = seconds // 3600
@@ -67,7 +66,7 @@ def get_runtime_info() -> Dict[str, Any]:
     }
 
 
-def get_request_info(request: Request) -> Dict[str, Any]:
+def get_request_info(request: Request) -> dict[str, Any]:
     """Extract request-related information."""
     client_ip = request.client.host if request.client else None
     user_agent = request.headers.get("user-agent", "")
@@ -79,7 +78,7 @@ def get_request_info(request: Request) -> Dict[str, Any]:
     }
 
 
-def get_endpoints() -> List[Dict[str, str]]:
+def get_endpoints() -> list[dict[str, str]]:
     """Describe available endpoints."""
     return [
         {"path": "/", "method": "GET", "description": "Service information"},
@@ -88,7 +87,7 @@ def get_endpoints() -> List[Dict[str, str]]:
 
 
 @app.get("/")
-async def index(request: Request) -> Dict[str, Any]:
+async def index(request: Request) -> dict[str, Any]:
     """Main endpoint - service and system information."""
     logger.info("Handling request for %s %s", request.method, request.url.path)
 
@@ -96,7 +95,7 @@ async def index(request: Request) -> Dict[str, Any]:
     runtime_info = get_runtime_info()
     request_info = get_request_info(request)
 
-    response: Dict[str, Any] = {
+    response: dict[str, Any] = {
         "service": {
             "name": "devops-info-service",
             "version": "1.0.0",
@@ -112,12 +111,12 @@ async def index(request: Request) -> Dict[str, Any]:
 
 
 @app.get("/health")
-async def health() -> Dict[str, Any]:
+async def health() -> dict[str, Any]:
     """Health check endpoint."""
     runtime_info = get_runtime_info()
     return {
         "status": "healthy",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "uptime_seconds": runtime_info["uptime_seconds"],
     }
 
