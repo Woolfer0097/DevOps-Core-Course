@@ -1,0 +1,39 @@
+# golangci-lint configuration for Go app
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  enable:
+    - errcheck      # Check for unchecked errors
+    - gosimple      # Simplify code
+    - govet         # Standard Go vet checks
+    - ineffassign   # Detect ineffectual assignments
+    - staticcheck   # Static analysis checks
+    - unused        # Find unused code
+    - gofmt         # Check formatting
+    - goimports     # Check import formatting
+    - misspell      # Find spelling mistakes
+    - revive        # Fast, configurable linter
+    - gosec         # Security-focused linter
+
+linters-settings:
+  errcheck:
+    check-blank: true
+  
+  gosec:
+    excludes:
+      - G104  # Allow some unhandled errors in tests
+  
+  revive:
+    rules:
+      - name: var-naming
+        disabled: true
+
+issues:
+  exclude-rules:
+    # Exclude some linters from test files
+    - path: _test\.go
+      linters:
+        - gosec
+        - errcheck

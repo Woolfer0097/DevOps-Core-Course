@@ -64,14 +64,17 @@ type Health struct {
 var startTime = time.Now().UTC()
 
 func getSystemInfo() System {
-	hostname, _ := os.Hostname()
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = "unknown"
+	}
 
 	return System{
-		Hostname:       hostname,
-		Platform:       runtime.GOOS,
-		Architecture:   runtime.GOARCH,
-		CPUCount:       runtime.NumCPU(),
-		GoVersion:      runtime.Version(),
+		Hostname:        hostname,
+		Platform:        runtime.GOOS,
+		Architecture:    runtime.GOARCH,
+		CPUCount:        runtime.NumCPU(),
+		GoVersion:       runtime.Version(),
 		OperatingSystem: runtime.GOOS,
 	}
 }
@@ -177,7 +180,10 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 func writeJSON(w http.ResponseWriter, status int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(payload)
+
+	if err := json.NewEncoder(w).Encode(payload); err != nil {
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+	}
 }
 
 func main() {
@@ -195,8 +201,16 @@ func main() {
 	http.HandleFunc("/health", healthHandler)
 
 	addr := host + ":" + port
-	if err := http.ListenAndServe(addr, nil); err != nil {
+
+	server := &http.Server{
+		Addr:              addr,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       60 * time.Second,
+	}
+
+	if err := server.ListenAndServe(); err != nil {
 		panic(err)
 	}
 }
-

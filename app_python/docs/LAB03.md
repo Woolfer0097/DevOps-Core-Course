@@ -50,7 +50,7 @@ pytest
 
 ### Semgrep Integration
 
-**Configuration:** Running multiple rulesets:
+**Configuration:** Running multiple rulesets (no cloud account required):
 - `p/security-audit` - Security vulnerabilities
 - `p/python` - Python-specific issues
 - `p/docker` - Dockerfile best practices
@@ -58,7 +58,9 @@ pytest
 
 **Findings:** No critical vulnerabilities detected in current codebase.
 
-**Strategy:** Semgrep runs as a separate job in parallel with tests. Fails the build on high/critical findings.
+**Strategy:** Semgrep runs as a separate job in parallel with tests. Runs locally without requiring Semgrep Cloud token. Fails the build on high/critical findings.
+
+**Note:** To use Semgrep Cloud dashboard (optional), add `SEMGREP_APP_TOKEN` secret and remove the `config` parameter.
 
 ## Key Decisions
 
@@ -87,3 +89,15 @@ Push to main/master/lab03 and PRs to main/master. Path filters prevent unnecessa
 - **Initial Semgrep setup:** Required creating Semgrep account and adding token to GitHub secrets
 - **Coverage configuration:** Needed to adjust paths since tests run from app_python directory
 - **Docker multi-platform:** Added explicit platform list for consistency across architectures
+
+---
+
+## Bonus Task Implementation
+
+**Multi-App CI with Path Filters:**
+✅ Implemented Go CI workflow (`.github/workflows/go-ci.yml`)
+✅ Path filters configured for both Python and Go workflows
+✅ Workflows run independently based on file changes
+✅ Test coverage tracking with Codecov for both apps
+
+See [../app_go/docs/LAB03.md](../../app_go/docs/LAB03.md) for Go-specific CI/CD documentation.
