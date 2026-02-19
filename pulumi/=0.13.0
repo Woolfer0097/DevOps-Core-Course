@@ -1,0 +1,16 @@
+Collecting pulumi-yandex
+  Using cached pulumi_yandex-0.13.0-py3-none-any.whl
+Requirement already satisfied: parver>=0.2.1 in ./venv/lib/python3.13/site-packages (from pulumi-yandex) (0.5)
+Requirement already satisfied: pulumi<4.0.0,>=3.0.0 in ./venv/lib/python3.13/site-packages (from pulumi-yandex) (3.222.0)
+Requirement already satisfied: semver>=2.8.1 in ./venv/lib/python3.13/site-packages (from pulumi-yandex) (3.0.4)
+Requirement already satisfied: debugpy~=1.8.7 in ./venv/lib/python3.13/site-packages (from pulumi<4.0.0,>=3.0.0->pulumi-yandex) (1.8.20)
+Requirement already satisfied: dill~=0.4 in ./venv/lib/python3.13/site-packages (from pulumi<4.0.0,>=3.0.0->pulumi-yandex) (0.4.1)
+Requirement already satisfied: grpcio<2,>=1.68.1 in ./venv/lib/python3.13/site-packages (from pulumi<4.0.0,>=3.0.0->pulumi-yandex) (1.78.0)
+Requirement already satisfied: pip>=24.3.1 in ./venv/lib/python3.13/site-packages (from pulumi<4.0.0,>=3.0.0->pulumi-yandex) (25.1.1)
+Requirement already satisfied: protobuf<7,>=3.20.3 in ./venv/lib/python3.13/site-packages (from pulumi<4.0.0,>=3.0.0->pulumi-yandex) (6.33.5)
+Requirement already satisfied: pyyaml~=6.0 in ./venv/lib/python3.13/site-packages (from pulumi<4.0.0,>=3.0.0->pulumi-yandex) (6.0.3)
+Requirement already satisfied: typing-extensions~=4.12 in ./venv/lib/python3.13/site-packages (from grpcio<2,>=1.68.1->pulumi<4.0.0,>=3.0.0->pulumi-yandex) (4.15.0)
+Requirement already satisfied: arpeggio>=1.7 in ./venv/lib/python3.13/site-packages (from parver>=0.2.1->pulumi-yandex) (2.0.3)
+Requirement already satisfied: attrs>=19.2 in ./venv/lib/python3.13/site-packages (from parver>=0.2.1->pulumi-yandex) (25.4.0)
+Installing collected packages: pulumi-yandex
+Successfully installed pulumi-yandex-0.13.0
