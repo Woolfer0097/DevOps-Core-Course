@@ -1,0 +1,3 @@
+pulumi>=3.0.0
+pulumi-yandex>=0.13.0
+setuptools  # Required for pkg_resources compatibility with Python 3.13 (pulumi-yandex v0.13.0 uses deprecated pkg_resources)

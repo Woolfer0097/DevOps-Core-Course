@@ -1,0 +1,6 @@
+name: lab04-yandex
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: Lab 04 — Yandex Cloud VM with Pulumi (Python)
