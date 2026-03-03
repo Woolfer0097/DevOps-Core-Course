@@ -61,7 +61,7 @@ resource "yandex_vpc_security_group" "lab" {
 }
 
 resource "yandex_compute_instance" "lab" {
-  name        = "lab-vm"
+  name        = "woolfer-vm"
   platform_id = "standard-v2"
   zone        = var.yc_zone
 
