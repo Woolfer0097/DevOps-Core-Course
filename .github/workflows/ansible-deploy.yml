@@ -93,15 +93,23 @@ jobs:
           ansible-playbook playbooks/deploy.yml --tags "app_deploy"
           rm -f .vault_pass
 
-      - name: Verify Deployment
+      - name: Verify Deployment via SSH tunnel
         env:
           VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           APP_PORT: ${{ secrets.APP_PORT }}
           HEALTHCHECK_PATH: ${{ secrets.HEALTHCHECK_PATH }}
         run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$VM_HOST" >> ~/.ssh/known_hosts
+
           APP_PORT="${APP_PORT:-8000}"
           HEALTHCHECK_PATH="${HEALTHCHECK_PATH:-/health}"
-          sleep 10
-          curl -fsS "http://${VM_HOST}:${APP_PORT}/"
-          curl -fsS "http://${VM_HOST}:${APP_PORT}${HEALTHCHECK_PATH}"
+
+          ssh -f -N -L 8000:localhost:${APP_PORT} ${VM_USER}@${VM_HOST}
+
+          curl -fsS "http://localhost:${APP_PORT}${HEALTHCHECK_PATH}"
 
