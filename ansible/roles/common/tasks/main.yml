@@ -15,10 +15,6 @@
         state: present
 
   rescue:
-    - name: Fix missing packages and retry apt update
-      ansible.builtin.command: apt-get update --fix-missing
-      changed_when: false
-
     - name: Retry apt cache update
       ansible.builtin.apt:
         update_cache: true

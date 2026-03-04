@@ -20,6 +20,9 @@
     - compose
 
 - name: Deploy application with Docker Compose
+  tags:
+    - app_deploy
+    - compose
   block:
     - name: Create app directory
       ansible.builtin.file:
@@ -44,6 +47,3 @@
       ansible.builtin.debug:
         msg: "Docker Compose deployment failed for {{ web_app_name }} in {{ web_app_compose_project_dir }}"
 
-  tags:
-    - app_deploy
-    - compose
