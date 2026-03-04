@@ -1,0 +1,100 @@
+name: Ansible Deployment
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'ansible/**'
+      - '.github/workflows/ansible-deploy.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'ansible/**'
+      - '.github/workflows/ansible-deploy.yml'
+
+env:
+  WORKING_DIR: ./ansible
+
+jobs:
+  lint:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible ansible-lint
+          ansible-galaxy collection install community.docker
+
+      - name: Run ansible-lint
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          ansible-lint playbooks/*.yml
+
+  deploy:
+    name: Deploy Application
+    needs: lint
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible
+          ansible-galaxy collection install community.docker
+
+      - name: Setup SSH
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$VM_HOST" >> ~/.ssh/known_hosts
+
+      - name: Prepare inventory and vault password
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          printf "[webservers]\nwoolfer-vm ansible_host=%s ansible_user=%s\n" "$VM_HOST" "$VM_USER" > "${{ env.WORKING_DIR }}/inventory/hosts.ini"
+          echo "$ANSIBLE_VAULT_PASSWORD" > "${{ env.WORKING_DIR }}/.vault_pass"
+
+      - name: Deploy with Ansible
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          ansible-playbook playbooks/deploy.yml --tags "app_deploy"
+          rm -f .vault_pass
+
+      - name: Verify Deployment
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          APP_PORT: ${{ secrets.APP_PORT }}
+          HEALTHCHECK_PATH: ${{ secrets.HEALTHCHECK_PATH }}
+        run: |
+          APP_PORT="${APP_PORT:-8000}"
+          HEALTHCHECK_PATH="${HEALTHCHECK_PATH:-/health}"
+          sleep 10
+          curl -fsS "http://${VM_HOST}:${APP_PORT}/"
+          curl -fsS "http://${VM_HOST}:${APP_PORT}${HEALTHCHECK_PATH}"
+
