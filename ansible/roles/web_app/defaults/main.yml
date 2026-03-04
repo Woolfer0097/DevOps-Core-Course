@@ -11,8 +11,8 @@ web_app_env: {}
 web_app_docker_compose_version: "3.8"
 web_app_compose_project_dir: "/opt/{{ web_app_name }}"
 
-web_app_dockerhub_username: "woolfer0097kek"
-web_app_dockerhub_password: "{{ vault_dockerhub_password }}"
+web_app_dockerhub_username: ""
+web_app_dockerhub_password: ""
 
 # Wipe Logic Control
 web_app_wipe: false
