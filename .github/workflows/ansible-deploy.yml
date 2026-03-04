@@ -99,7 +99,7 @@ jobs:
           APP_PORT: ${{ secrets.APP_PORT }}
           HEALTHCHECK_PATH: ${{ secrets.HEALTHCHECK_PATH }}
         run: |
-          APP_PORT="${APP_PORT:-5000}"
+          APP_PORT="${APP_PORT:-8000}"
           HEALTHCHECK_PATH="${HEALTHCHECK_PATH:-/health}"
           sleep 10
           curl -fsS "http://${VM_HOST}:${APP_PORT}/"
