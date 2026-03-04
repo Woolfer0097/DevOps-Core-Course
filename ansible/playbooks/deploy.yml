@@ -1,7 +1,7 @@
 ---
 - name: Deploy application
   hosts: webservers
-  become: yes
+  become: true
   vars_files:
     - "{{ playbook_dir }}/../group_vars/all.yml"
 

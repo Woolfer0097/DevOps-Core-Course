@@ -1,5 +1,8 @@
 ---
 - name: Common | Packages
+  become: true
+  tags:
+    - packages
   block:
     - name: Update apt cache
       ansible.builtin.apt:
@@ -32,11 +35,11 @@
         content: "common packages block completed on {{ ansible_date_time.iso8601 }}\n"
         mode: "0644"
 
+- name: Common | Users
+  when: (common_users | length) > 0
   become: true
   tags:
-    - packages
-
-- name: Common | Users
+    - users
   block:
     - name: Ensure users exist
       ansible.builtin.user:
@@ -54,13 +57,8 @@
         content: "common users block completed on {{ ansible_date_time.iso8601 }}\n"
         mode: "0644"
 
-  when: (common_users | length) > 0
-  become: true
-  tags:
-    - users
-
 - name: Common | Set timezone
-  ansible.builtin.timezone:
+  community.general.timezone:
     name: "{{ common_timezone }}"
   become: true
   tags:

@@ -1,5 +1,8 @@
 ---
 - name: Docker | Install
+  become: true
+  tags:
+    - docker_install
   block:
     - name: Install dependencies for Docker repo
       ansible.builtin.apt:
@@ -62,11 +65,10 @@
         state: started
         enabled: true
 
+- name: Docker | Configure
   become: true
   tags:
-    - docker_install
-
-- name: Docker | Configure
+    - docker_config
   block:
     - name: Add user to docker group
       ansible.builtin.user:
@@ -85,7 +87,3 @@
         name: docker
         state: started
         enabled: true
-
-  become: true
-  tags:
-    - docker_config

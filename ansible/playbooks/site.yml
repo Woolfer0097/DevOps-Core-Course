@@ -1,0 +1,5 @@
+---
+- name: Site playbook (placeholder)
+  hosts: webservers
+  gather_facts: false
+
