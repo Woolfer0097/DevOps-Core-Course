@@ -29,4 +29,3 @@
     - name: Log wipe completion
       ansible.builtin.debug:
         msg: "Application {{ web_app_name }} wiped successfully"
-

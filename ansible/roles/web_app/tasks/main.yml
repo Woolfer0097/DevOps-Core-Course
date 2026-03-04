@@ -46,4 +46,3 @@
     - name: Log deployment failure
       ansible.builtin.debug:
         msg: "Docker Compose deployment failed for {{ web_app_name }} in {{ web_app_compose_project_dir }}"
-
