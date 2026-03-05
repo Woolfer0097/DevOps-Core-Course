@@ -587,7 +587,7 @@ PLAY RECAP *********************************************************************
 woolfer-vm                 : ok=2    changed=0    unreachable=0    failed=0    skipped=5    rescued=0    ignored=0   
 ```
 
-- Screenshot of app responding after Scenario 3:
+![cicd](image.png)
 
 ### Research answers (Task 3)
 
@@ -681,4 +681,4 @@ This file (`ansible/docs/LAB06.md`) is the documentation and evidence record for
 ## Summary
 
 - **Key learnings:** blocks/rescue/always, tag-driven runs, Compose templating, dependency ordering, safe wipe patterns, CD via GitHub Actions.
-- **Time spent:** (fill in)
+- **Time spent:** 6 hours
