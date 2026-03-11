@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   loki:
     image: grafana/loki:3.0.0
@@ -20,11 +18,11 @@ services:
           cpus: "0.5"
           memory: 512M
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3100/ready || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 15s
 
   promtail:
     image: grafana/promtail:3.0.0
@@ -32,12 +30,13 @@ services:
     volumes:
       - ./promtail/config.yml:/etc/promtail/config.yml:ro
       - /var/log:/var/log:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/snap/docker/common/var-lib-docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - logging
     depends_on:
-      - loki
+      loki:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -47,11 +46,11 @@ services:
           cpus: "0.25"
           memory: 256M
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9080/targets || exit 1"]
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/9080' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 15s
 
   grafana:
     image: grafana/grafana:12.3.1
@@ -66,7 +65,8 @@ services:
     networks:
       - logging
     depends_on:
-      - loki
+      loki:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -85,11 +85,8 @@ services:
   app-python:
     build:
       context: ../app_python
-    environment:
-      HOST: "0.0.0.0"
-      PORT: "8000"
     ports:
-      - "8000:8000"
+      - "8000:5000"
     networks:
       - logging
     labels:
