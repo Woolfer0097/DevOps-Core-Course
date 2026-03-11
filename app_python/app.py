@@ -2,8 +2,10 @@
 DevOps Info Service - FastAPI implementation.
 
 Provides system, runtime, and request information plus a basic health check.
+Now emits structured JSON logs for easier aggregation.
 """
 
+import json
 import logging
 import os
 import platform
@@ -22,11 +24,39 @@ PORT: int = int(os.getenv("PORT", 5000))
 DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
 
 
-# Logging configuration
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+class JSONFormatter(logging.Formatter):
+    """Format logs as JSON with common fields."""
+
+    def format(self, record: logging.LogRecord) -> str:  # type: ignore[override]
+        log_record: dict[str, Any] = {
+            "timestamp": datetime.now(UTC).isoformat(),
+            "level": record.levelname,
+            "message": record.getMessage(),
+            "logger": record.name,
+        }
+
+        for attr in (
+            "method",
+            "path",
+            "status_code",
+            "client_ip",
+            "duration",
+        ):
+            value = getattr(record, attr, None)
+            if value is not None:
+                log_record[attr] = value
+
+        if record.exc_info:
+            log_record["exc_info"] = self.formatException(record.exc_info)
+
+        return json.dumps(log_record)
+
+
+handler = logging.StreamHandler()
+handler.setFormatter(JSONFormatter())
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+root_logger.handlers = [handler]
 logger = logging.getLogger(__name__)
 
 
@@ -35,6 +65,28 @@ START_TIME = datetime.now(UTC)
 
 
 app = FastAPI(title="DevOps Info Service")
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """Log each HTTP request with structured JSON."""
+    start_time = datetime.now(UTC)
+    response = await call_next(request)
+
+    duration = (datetime.now(UTC) - start_time).total_seconds()
+
+    logger.info(
+        "HTTP request completed",
+        extra={
+            "method": request.method,
+            "path": request.url.path,
+            "status_code": response.status_code,
+            "client_ip": request.client.host if request.client else None,
+            "duration": duration,
+        },
+    )
+
+    return response
 
 
 def get_system_info() -> dict[str, Any]:
@@ -89,7 +141,14 @@ def get_endpoints() -> list[dict[str, str]]:
 @app.get("/")
 async def index(request: Request) -> dict[str, Any]:
     """Main endpoint - service and system information."""
-    logger.info("Handling request for %s %s", request.method, request.url.path)
+    logger.info(
+        "Handling request",
+        extra={
+            "method": request.method,
+            "path": request.url.path,
+            "client_ip": request.client.host if request.client else None,
+        },
+    )
 
     system_info = get_system_info()
     runtime_info = get_runtime_info()
@@ -157,5 +216,8 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 
 
 if __name__ == "__main__":
-    logger.info("Starting DevOps Info Service on %s:%s", HOST, PORT)
+    logger.info(
+        "Starting DevOps Info Service",
+        extra={"host": HOST, "port": PORT},
+    )
     uvicorn.run("app:app", host=HOST, port=PORT, reload=DEBUG)
