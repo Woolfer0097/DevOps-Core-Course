@@ -10,12 +10,14 @@ import logging
 import os
 import platform
 import socket
+from time import perf_counter
 from datetime import UTC, datetime
 from typing import Any
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # Configuration
@@ -67,26 +69,72 @@ START_TIME = datetime.now(UTC)
 app = FastAPI(title="DevOps Info Service")
 
 
+def normalize_endpoint(path: str) -> str:
+    """Normalize endpoint labels to keep metric cardinality predictable."""
+    if path in {"/", "/health", "/metrics"}:
+        return path
+    return "/other"
+
+
+HTTP_REQUESTS_TOTAL = Counter(
+    "http_requests_total",
+    "Total HTTP requests processed by endpoint and status",
+    ["method", "endpoint", "status_code"],
+)
+HTTP_REQUEST_DURATION_SECONDS = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request duration in seconds",
+    ["method", "endpoint"],
+)
+HTTP_REQUESTS_IN_PROGRESS = Gauge(
+    "http_requests_in_progress",
+    "HTTP requests currently being processed",
+    ["method", "endpoint"],
+)
+ENDPOINT_CALLS_TOTAL = Counter(
+    "devops_info_endpoint_calls_total",
+    "Total calls to user-facing API endpoints",
+    ["endpoint"],
+)
+SYSTEM_INFO_COLLECTION_SECONDS = Histogram(
+    "devops_info_system_collection_seconds",
+    "Time spent collecting system information",
+)
+
+
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     """Log each HTTP request with structured JSON."""
-    start_time = datetime.now(UTC)
-    response = await call_next(request)
+    start = perf_counter()
+    endpoint = normalize_endpoint(request.url.path)
+    method = request.method
+    status_code = 500
 
-    duration = (datetime.now(UTC) - start_time).total_seconds()
+    HTTP_REQUESTS_IN_PROGRESS.labels(method=method, endpoint=endpoint).inc()
+    try:
+        response = await call_next(request)
+        status_code = response.status_code
+        return response
+    finally:
+        duration = perf_counter() - start
+        HTTP_REQUESTS_IN_PROGRESS.labels(method=method, endpoint=endpoint).dec()
+        HTTP_REQUESTS_TOTAL.labels(
+            method=method, endpoint=endpoint, status_code=str(status_code)
+        ).inc()
+        HTTP_REQUEST_DURATION_SECONDS.labels(method=method, endpoint=endpoint).observe(
+            duration
+        )
 
-    logger.info(
-        "HTTP request completed",
-        extra={
-            "method": request.method,
-            "path": request.url.path,
-            "status_code": response.status_code,
-            "client_ip": request.client.host if request.client else None,
-            "duration": duration,
-        },
-    )
-
-    return response
+        logger.info(
+            "HTTP request completed",
+            extra={
+                "method": method,
+                "path": request.url.path,
+                "status_code": status_code,
+                "client_ip": request.client.host if request.client else None,
+                "duration": duration,
+            },
+        )
 
 
 def get_system_info() -> dict[str, Any]:
@@ -135,6 +183,7 @@ def get_endpoints() -> list[dict[str, str]]:
     return [
         {"path": "/", "method": "GET", "description": "Service information"},
         {"path": "/health", "method": "GET", "description": "Health check"},
+        {"path": "/metrics", "method": "GET", "description": "Prometheus metrics"},
     ]
 
 
@@ -150,7 +199,9 @@ async def index(request: Request) -> dict[str, Any]:
         },
     )
 
-    system_info = get_system_info()
+    ENDPOINT_CALLS_TOTAL.labels(endpoint="/").inc()
+    with SYSTEM_INFO_COLLECTION_SECONDS.time():
+        system_info = get_system_info()
     runtime_info = get_runtime_info()
     request_info = get_request_info(request)
 
@@ -172,12 +223,19 @@ async def index(request: Request) -> dict[str, Any]:
 @app.get("/health")
 async def health() -> dict[str, Any]:
     """Health check endpoint."""
+    ENDPOINT_CALLS_TOTAL.labels(endpoint="/health").inc()
     runtime_info = get_runtime_info()
     return {
         "status": "healthy",
         "timestamp": datetime.now(UTC).isoformat(),
         "uptime_seconds": runtime_info["uptime_seconds"],
     }
+
+
+@app.get("/metrics")
+async def metrics() -> Response:
+    """Prometheus metrics endpoint."""
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 @app.exception_handler(StarletteHTTPException)
