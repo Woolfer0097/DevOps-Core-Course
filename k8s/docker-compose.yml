@@ -1,0 +1,22 @@
+services:
+  k8s-dev:
+    build: .
+    container_name: k8s-dev
+    # Share host network so minikube API server (127.0.0.1:PORT) is reachable from inside
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../:/workspace
+      - minikube-home:/home/devops/.minikube
+      - kube-config:/home/devops/.kube
+    working_dir: /workspace/k8s
+    stdin_open: true
+    tty: true
+    privileged: true
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+
+volumes:
+  minikube-home:
+  kube-config:
