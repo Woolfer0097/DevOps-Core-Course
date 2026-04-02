@@ -776,44 +776,49 @@ helm install app1-release k8s/app1
 
 ## Checklist
 
+Implementation note:
+- Helm chart implementation is available at `k8s/devops-info/`.
+- Documentation is available at `k8s/HELM.md`.
+- Runtime verification items remain unchecked because this workspace does not have `helm`/`kubectl` installed.
+
 ### Task 1 — Helm Fundamentals (2 pts)
 - [ ] Helm installed and verified
 - [ ] Chart repositories explored
-- [ ] Helm concepts understood
-- [ ] Documentation of setup
+- [x] Helm concepts understood
+- [x] Documentation of setup
 
 ### Task 2 — Create Your Helm Chart (3 pts)
-- [ ] Chart created in `k8s/` directory
-- [ ] `Chart.yaml` properly configured
-- [ ] Manifests converted to templates
-- [ ] Values properly extracted
-- [ ] Helper templates implemented
-- [ ] Health checks remain functional (not commented out!)
+- [x] Chart created in `k8s/` directory
+- [x] `Chart.yaml` properly configured
+- [x] Manifests converted to templates
+- [x] Values properly extracted
+- [x] Helper templates implemented
+- [x] Health checks remain functional (not commented out!)
 - [ ] Chart installs successfully
 
 ### Task 3 — Multi-Environment Support (2 pts)
-- [ ] `values-dev.yaml` created
-- [ ] `values-prod.yaml` created
-- [ ] Environment-specific configurations
+- [x] `values-dev.yaml` created
+- [x] `values-prod.yaml` created
+- [x] Environment-specific configurations
 - [ ] Both environments tested
-- [ ] Documentation of differences
+- [x] Documentation of differences
 
 ### Task 4 — Chart Hooks (3 pts)
-- [ ] Pre-install hook implemented
-- [ ] Post-install hook implemented
-- [ ] Proper hook annotations
-- [ ] Hook weights configured
-- [ ] Deletion policies applied
+- [x] Pre-install hook implemented
+- [x] Post-install hook implemented
+- [x] Proper hook annotations
+- [x] Hook weights configured
+- [x] Deletion policies applied
 - [ ] Hooks execute successfully
 - [ ] Hooks deleted per policy
 
 ### Task 5 — Documentation (2 pts)
-- [ ] `k8s/HELM.md` complete
-- [ ] Chart structure explained
-- [ ] Configuration guide provided
-- [ ] Hook implementation documented
+- [x] `k8s/HELM.md` complete
+- [x] Chart structure explained
+- [x] Configuration guide provided
+- [x] Hook implementation documented
 - [ ] Installation evidence included
-- [ ] Operations documented
+- [x] Operations documented
 
 ### Bonus — Library Charts (2.5 pts)
 - [ ] Library chart created
