@@ -1,0 +1,78 @@
+replicaCount: 3
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: woolfer0097kek/devops-info-python
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+serviceAccount:
+  create: false
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 5000
+  nodePort: 30080
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+strategy:
+  maxSurge: 1
+  maxUnavailable: 0
+
+probes:
+  liveness:
+    path: /health
+    port: 5000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
+  readiness:
+    path: /health
+    port: 5000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 1
+    failureThreshold: 2
+
+env:
+  PORT: "5000"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+hooks:
+  enabled: true
+  image: busybox:1.36
+  deletePolicy: hook-succeeded
+  preInstall:
+    enabled: true
+    weight: -5
+    command: echo "Pre-install validation" && sleep 5 && echo "Pre-install completed"
+  postInstall:
+    enabled: true
+    weight: 5
+    command: echo "Post-install smoke check" && sleep 5 && echo "Post-install completed"

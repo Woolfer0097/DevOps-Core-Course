@@ -1,0 +1,7 @@
+# Ignore common local and VCS artifacts
+.git/
+.gitignore
+.idea/
+*.swp
+*.tmp
+*.log
