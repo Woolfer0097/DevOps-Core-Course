@@ -56,3 +56,13 @@ Service account name
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Common environment variables (bonus task DRY pattern)
+*/}}
+{{- define "devops-info.envVars" -}}
+- name: APP_ENV
+  value: {{ .Values.env.APP_ENV | quote }}
+- name: LOG_LEVEL
+  value: {{ .Values.env.LOG_LEVEL | quote }}
+{{- end }}
