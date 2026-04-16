@@ -1,0 +1,15 @@
+services:
+  devops-info:
+    build: .
+    container_name: devops-info
+    ports:
+      - "5000:5000"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "5000"
+      DATA_DIR: "/app/data"
+      APP_ENV: "local"
+      LOG_LEVEL: "info"
+    volumes:
+      - ./visits-data:/app/data
+    restart: unless-stopped
