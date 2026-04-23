@@ -5,11 +5,14 @@ Provides system, runtime, and request information plus a basic health check.
 Now emits structured JSON logs for easier aggregation.
 """
 
+import asyncio
 import json
 import logging
 import os
 import platform
 import socket
+import tempfile
+from pathlib import Path
 from time import perf_counter
 from datetime import UTC, datetime
 from typing import Any
@@ -24,6 +27,9 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 HOST: str = os.getenv("HOST", "0.0.0.0")
 PORT: int = int(os.getenv("PORT", 5000))
 DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
+DATA_DIR: str = os.getenv("DATA_DIR", "/data")
+VISITS_FILE: Path = Path(DATA_DIR) / "visits"
+CONFIG_FILE: str = os.getenv("CONFIG_FILE", "/config/config.json")
 
 
 class JSONFormatter(logging.Formatter):
@@ -68,10 +74,52 @@ START_TIME = datetime.now(UTC)
 
 app = FastAPI(title="DevOps Info Service")
 
+_visits_lock = asyncio.Lock()
+
+
+def _read_visits() -> int:
+    """Read visits counter from file, default to 0 if missing/invalid."""
+    try:
+        return int(VISITS_FILE.read_text().strip() or "0")
+    except (FileNotFoundError, ValueError):
+        return 0
+
+
+def _write_visits(value: int) -> None:
+    """Atomically write visits counter (tmp file + rename)."""
+    VISITS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_path = tempfile.mkstemp(dir=str(VISITS_FILE.parent), prefix=".visits.")
+    try:
+        with os.fdopen(fd, "w") as f:
+            f.write(str(value))
+        os.replace(tmp_path, VISITS_FILE)
+    except Exception:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
+
+
+async def _increment_visits() -> int:
+    async with _visits_lock:
+        new_value = _read_visits() + 1
+        _write_visits(new_value)
+        return new_value
+
+
+def _load_config_file() -> dict[str, Any]:
+    """Best-effort read of the mounted ConfigMap config file."""
+    try:
+        with open(CONFIG_FILE) as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
 
 def normalize_endpoint(path: str) -> str:
     """Normalize endpoint labels to keep metric cardinality predictable."""
-    if path in {"/", "/health", "/metrics"}:
+    if path in {"/", "/health", "/metrics", "/visits", "/config"}:
         return path
     return "/other"
 
@@ -184,6 +232,8 @@ def get_endpoints() -> list[dict[str, str]]:
         {"path": "/", "method": "GET", "description": "Service information"},
         {"path": "/health", "method": "GET", "description": "Health check"},
         {"path": "/metrics", "method": "GET", "description": "Prometheus metrics"},
+        {"path": "/visits", "method": "GET", "description": "Persistent visits counter"},
+        {"path": "/config", "method": "GET", "description": "Mounted ConfigMap content"},
     ]
 
 
@@ -204,6 +254,7 @@ async def index(request: Request) -> dict[str, Any]:
         system_info = get_system_info()
     runtime_info = get_runtime_info()
     request_info = get_request_info(request)
+    visits = await _increment_visits()
 
     response: dict[str, Any] = {
         "service": {
@@ -215,9 +266,33 @@ async def index(request: Request) -> dict[str, Any]:
         "system": system_info,
         "runtime": runtime_info,
         "request": request_info,
+        "visits": visits,
         "endpoints": get_endpoints(),
     }
     return response
+
+
+@app.get("/visits")
+async def visits() -> dict[str, Any]:
+    """Return current persistent visits counter without incrementing."""
+    ENDPOINT_CALLS_TOTAL.labels(endpoint="/visits").inc()
+    return {"visits": _read_visits(), "file": str(VISITS_FILE)}
+
+
+@app.get("/config")
+async def config() -> dict[str, Any]:
+    """Return the mounted ConfigMap content and selected env vars."""
+    ENDPOINT_CALLS_TOTAL.labels(endpoint="/config").inc()
+    return {
+        "file_path": CONFIG_FILE,
+        "file_content": _load_config_file(),
+        "env": {
+            "APP_ENV": os.getenv("APP_ENV"),
+            "LOG_LEVEL": os.getenv("LOG_LEVEL"),
+            "FEATURE_FLAG_BETA": os.getenv("FEATURE_FLAG_BETA"),
+            "WELCOME_MESSAGE": os.getenv("WELCOME_MESSAGE"),
+        },
+    }
 
 
 @app.get("/health")

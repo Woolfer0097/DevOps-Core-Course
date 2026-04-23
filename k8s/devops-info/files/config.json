@@ -1,0 +1,16 @@
+{
+  "app": {
+    "name": "devops-info-service",
+    "version": "1.0.0"
+  },
+  "environment": "dev",
+  "features": {
+    "beta_ui": true,
+    "verbose_logging": false,
+    "visits_endpoint": true
+  },
+  "limits": {
+    "max_request_bytes": 1048576,
+    "max_visits_displayed": 1000
+  }
+}

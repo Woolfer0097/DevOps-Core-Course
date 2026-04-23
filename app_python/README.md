@@ -61,6 +61,16 @@ The service will start on `http://HOST:PORT` (default `0.0.0.0:5000`).
     curl http://127.0.0.1:5000/health
     ```
 
+- `GET /visits`
+  - **Description**: Returns the persistent visits counter (file-backed, survives restarts). Incremented on every `GET /` request.
+  - **Example**:
+    ```bash
+    curl http://127.0.0.1:5000/visits
+    ```
+
+- `GET /config`
+  - **Description**: Returns the JSON content of the mounted ConfigMap file at `$CONFIG_FILE` plus selected env vars sourced from a ConfigMap.
+
 ## Configuration
 
 The application is configurable via environment variables:
@@ -70,6 +80,8 @@ The application is configurable via environment variables:
 | `HOST`   | `0.0.0.0`   | Interface the server binds to               |
 | `PORT`   | `5000`      | TCP port the server listens on              |
 | `DEBUG`  | `False`     | Enables FastAPI/uvicorn reload when `true` |
+| `DATA_DIR` | `/data`   | Directory where the visits counter file is stored |
+| `CONFIG_FILE` | `/config/config.json` | Path to a JSON config file mounted via ConfigMap |
 
 Example:
 
@@ -117,6 +129,24 @@ ruff check .
 **Run:** `docker run -p <host-port>:5000 <image-name>` (app listens on 5000 inside container)
 
 **Pull from Docker Hub:** `docker pull <your-dockerhub-username>/<repo-name>:<tag>` then run as above.
+
+### Docker Compose (persistent visits)
+
+A `docker-compose.yml` bind-mounts `./visits-data` into the container at `/app/data` so the
+visits counter survives container restarts.
+
+```bash
+cd app_python
+mkdir -p visits-data
+# container runs as non-root (uid 1000) so make the bind mount writable
+sudo chown -R 1000:1000 visits-data || true
+docker compose up --build -d
+curl -s http://127.0.0.1:5000/        # increments counter
+curl -s http://127.0.0.1:5000/visits  # read-only
+cat ./visits-data/visits               # counter is persisted on host
+docker compose restart devops-info
+curl -s http://127.0.0.1:5000/visits  # value is preserved across restart
+```
 
 ## CI/CD
 
