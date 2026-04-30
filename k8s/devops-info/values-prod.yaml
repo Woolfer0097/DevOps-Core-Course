@@ -4,8 +4,8 @@ image:
   tag: "1.0.0"
 
 service:
-  type: LoadBalancer
-  nodePort: null
+  type: NodePort
+  nodePort: 30081
 
 resources:
   limits:
