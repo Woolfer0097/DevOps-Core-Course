@@ -1,0 +1,13 @@
+Set kubectl context to "kind-devops-lab"
+NAME                       STATUS   ROLES           AGE   VERSION
+devops-lab-control-plane   Ready    control-plane   7d    v1.35.1
+NAME                                      READY   STATUS    RESTARTS   AGE
+argo-rollouts-5f64f8d68-hjrgj             1/1     Running   0          12m
+argo-rollouts-dashboard-755bbc64c-jgkxq   1/1     Running   0          12m
+kubectl-argo-rollouts: v1.9.0+838d4e7
+  BuildDate: 2026-03-20T21:08:11Z
+  GitCommit: 838d4e792be666ec11bd0c80331e0c5511b5010e
+  GitTreeState: clean
+  GoVersion: go1.24.13
+  Compiler: gc
+  Platform: linux/amd64

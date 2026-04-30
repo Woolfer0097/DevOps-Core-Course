@@ -1,0 +1,89 @@
+namespace/lab14 unchanged
+service/lab14-canary unchanged
+rollout.argoproj.io/lab14-canary configured
+rollout "lab14-canary" image updated
+Name:            lab14-canary
+Namespace:       lab14
+Status:          [94m◌[0m Progressing
+Message:         waiting for rollout spec update to be observed
+Strategy:        Canary
+  Step:          9/9
+  SetWeight:     100
+  ActualWeight:  100
+Images:          argoproj/rollouts-demo:blue ([32mstable[0m)
+Replicas:
+  Desired:       5
+  Current:       5
+  Updated:       5
+  Ready:         5
+  Available:     5
+
+NAME                                     KIND        STATUS         AGE    INFO
+⟳ lab14-canary                           Rollout     [94m◌[0m Progressing  5m18s  
+├──# revision:3                                                            
+│  └──⧉ [32mlab14-canary-598b8b657[0m           ReplicaSet  [32m✔[0m Healthy      5m18s  [32mstable[0m
+│     ├──□ lab14-canary-598b8b657-c6nvr  Pod         [32m✔[0m Running      5m18s  ready:1/1
+│     ├──□ lab14-canary-598b8b657-hmnd5  Pod         [32m✔[0m Running      5m18s  ready:1/1
+│     ├──□ lab14-canary-598b8b657-kvt8s  Pod         [32m✔[0m Running      5m18s  ready:1/1
+│     ├──□ lab14-canary-598b8b657-ljfbb  Pod         [32m✔[0m Running      5m18s  ready:1/1
+│     └──□ lab14-canary-598b8b657-6v2jj  Pod         [32m✔[0m Running      5m13s  ready:1/1
+└──# revision:2                                                            
+   └──⧉ lab14-canary-6799f868bf          ReplicaSet  [0m•[0m ScaledDown   5m18s  
+rollout 'lab14-canary' promoted
+Name:            lab14-canary
+Namespace:       lab14
+Status:          [94m◌[0m Progressing
+Message:         waiting for rollout spec update to be observed
+Strategy:        Canary
+  Step:          9/9
+  SetWeight:     100
+  ActualWeight:  100
+Images:          argoproj/rollouts-demo:blue ([32mstable[0m)
+Replicas:
+  Desired:       5
+  Current:       5
+  Updated:       5
+  Ready:         5
+  Available:     5
+
+NAME                                     KIND        STATUS         AGE    INFO
+⟳ lab14-canary                           Rollout     [94m◌[0m Progressing  5m18s  
+├──# revision:3                                                            
+│  └──⧉ [32mlab14-canary-598b8b657[0m           ReplicaSet  [32m✔[0m Healthy      5m18s  [32mstable[0m
+│     ├──□ lab14-canary-598b8b657-c6nvr  Pod         [32m✔[0m Running      5m18s  ready:1/1
+│     ├──□ lab14-canary-598b8b657-hmnd5  Pod         [32m✔[0m Running      5m18s  ready:1/1
+│     ├──□ lab14-canary-598b8b657-kvt8s  Pod         [32m✔[0m Running      5m18s  ready:1/1
+│     ├──□ lab14-canary-598b8b657-ljfbb  Pod         [32m✔[0m Running      5m18s  ready:1/1
+│     └──□ lab14-canary-598b8b657-6v2jj  Pod         [32m✔[0m Running      5m13s  ready:1/1
+└──# revision:2                                                            
+   └──⧉ lab14-canary-6799f868bf          ReplicaSet  [0m•[0m ScaledDown   5m18s  
+rollout 'lab14-canary' aborted
+Name:            lab14-canary
+Namespace:       lab14
+Status:          [94m◌[0m Progressing
+Message:         more replicas need to be updated
+Strategy:        Canary
+  Step:          0/9
+  SetWeight:     20
+  ActualWeight:  0
+Images:          argoproj/rollouts-demo:blue ([32mstable[0m)
+                 argoproj/rollouts-demo:yellow ([33mcanary[0m)
+Replicas:
+  Desired:       5
+  Current:       5
+  Updated:       1
+  Ready:         4
+  Available:     4
+
+NAME                                      KIND        STATUS               AGE    INFO
+⟳ lab14-canary                            Rollout     [94m◌[0m Progressing        5m18s  
+├──# revision:4                                                                   
+│  └──⧉ [33mlab14-canary-6799f868bf[0m           ReplicaSet  [94m◌[0m Progressing        5m18s  [33mcanary[0m
+│     └──□ lab14-canary-6799f868bf-v6xzv  Pod         [94m◌[0m ContainerCreating  0s     ready:0/1
+└──# revision:3                                                                   
+   └──⧉ [32mlab14-canary-598b8b657[0m            ReplicaSet  [32m✔[0m Healthy            5m18s  [32mstable[0m
+      ├──□ lab14-canary-598b8b657-c6nvr   Pod         [32m✔[0m Running            5m18s  ready:1/1
+      ├──□ lab14-canary-598b8b657-hmnd5   Pod         [32m✔[0m Running            5m18s  ready:1/1
+      ├──□ lab14-canary-598b8b657-kvt8s   Pod         [32m✔[0m Running            5m18s  ready:1/1
+      ├──□ lab14-canary-598b8b657-ljfbb   Pod         [32m✔[0m Running            5m18s  ready:1/1
+      └──□ lab14-canary-598b8b657-6v2jj   Pod         [94m◌[0m Terminating        5m13s  ready:1/1

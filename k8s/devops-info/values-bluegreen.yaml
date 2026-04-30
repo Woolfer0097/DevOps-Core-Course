@@ -1,0 +1,12 @@
+rollout:
+  enabled: true
+  strategy: blueGreen
+  blueGreen:
+    autoPromotionEnabled: false
+
+service:
+  type: ClusterIP
+  nodePort: null
+
+image:
+  tag: "1.0.2"
