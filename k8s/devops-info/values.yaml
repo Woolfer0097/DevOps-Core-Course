@@ -52,6 +52,13 @@ statefulset:
     type: RollingUpdate
     partition: 0
 
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  path: /metrics
+  labels:
+    release: monitoring
+
 probes:
   liveness:
     path: /health

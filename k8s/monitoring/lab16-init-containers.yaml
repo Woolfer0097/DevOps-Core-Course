@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab16
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab16-dependency
+  namespace: lab16
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lab16-dependency
+  template:
+    metadata:
+      labels:
+        app: lab16-dependency
+    spec:
+      containers:
+        - name: web
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lab16-dependency
+  namespace: lab16
+spec:
+  selector:
+    app: lab16-dependency
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab16-init-demo
+  namespace: lab16
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lab16-init-demo
+  template:
+    metadata:
+      labels:
+        app: lab16-init-demo
+    spec:
+      initContainers:
+        - name: wait-for-service
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - until nslookup lab16-dependency.lab16.svc.cluster.local; do echo "waiting for dependency service"; sleep 2; done
+        - name: init-download
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - wget -O /work-dir/index.html https://example.com
+          volumeMounts:
+            - name: workdir
+              mountPath: /work-dir
+      containers:
+        - name: main
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - echo "main container started"; ls -la /data; sleep 3600
+          volumeMounts:
+            - name: workdir
+              mountPath: /data
+      volumes:
+        - name: workdir
+          emptyDir: {}
