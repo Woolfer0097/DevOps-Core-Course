@@ -45,6 +45,13 @@ rollout:
   blueGreen:
     autoPromotionEnabled: false
 
+statefulset:
+  enabled: false
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    partition: 0
+
 probes:
   liveness:
     path: /health
