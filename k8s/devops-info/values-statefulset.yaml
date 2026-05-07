@@ -19,3 +19,6 @@ persistence:
   storageClass: ""
   mountPath: "/data"
   fsGroup: 1000
+
+serviceMonitor:
+  enabled: true

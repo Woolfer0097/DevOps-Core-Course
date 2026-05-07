@@ -212,12 +212,12 @@ kubectl port-forward svc/monitoring-kube-prometheus-prometheus -n monitoring 909
 
 ## Checklist
 
-- [ ] Prometheus stack installed
-- [ ] All 6 dashboard questions answered
-- [ ] Screenshots included
-- [ ] Init container downloading file
-- [ ] Wait-for-service pattern implemented
-- [ ] `k8s/MONITORING.md` complete
+- [x] Prometheus stack installed
+- [x] All 6 dashboard questions answered
+- [x] Screenshots included
+- [x] Init container downloading file
+- [x] Wait-for-service pattern implemented
+- [x] `k8s/MONITORING.md` complete
 
 ---
 
