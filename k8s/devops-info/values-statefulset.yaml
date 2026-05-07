@@ -1,0 +1,21 @@
+replicaCount: 3
+
+service:
+  type: ClusterIP
+  port: 5000
+  targetPort: 5000
+
+statefulset:
+  enabled: true
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    partition: 0
+
+persistence:
+  enabled: true
+  size: 100Mi
+  accessMode: ReadWriteOnce
+  storageClass: ""
+  mountPath: "/data"
+  fsGroup: 1000

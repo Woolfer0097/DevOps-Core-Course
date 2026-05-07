@@ -256,14 +256,14 @@ spec:
 
 ## Checklist
 
-- [ ] StatefulSet guarantees documented
-- [ ] `statefulset.yaml` created with volumeClaimTemplates
-- [ ] Headless service created
-- [ ] Per-pod PVCs verified
-- [ ] DNS resolution tested
-- [ ] Per-pod storage isolation proven
-- [ ] Persistence test passed
-- [ ] `k8s/STATEFULSET.md` complete
+- [x] StatefulSet guarantees documented
+- [x] `statefulset.yaml` created with volumeClaimTemplates
+- [x] Headless service created
+- [x] Per-pod PVCs verified
+- [x] DNS resolution tested
+- [x] Per-pod storage isolation proven
+- [x] Persistence test passed
+- [x] `k8s/STATEFULSET.md` complete
 
 ---
 
