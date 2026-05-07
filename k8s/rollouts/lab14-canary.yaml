@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab14
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lab14-canary
+  namespace: lab14
+spec:
+  selector:
+    app: lab14-canary
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: lab14-canary
+  namespace: lab14
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: lab14-canary
+  template:
+    metadata:
+      labels:
+        app: lab14-canary
+    spec:
+      containers:
+        - name: app
+          image: argoproj/rollouts-demo:blue
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: {}
+        - setWeight: 40
+        - pause:
+            duration: 30s
+        - setWeight: 60
+        - pause:
+            duration: 30s
+        - setWeight: 80
+        - pause:
+            duration: 30s
+        - setWeight: 100

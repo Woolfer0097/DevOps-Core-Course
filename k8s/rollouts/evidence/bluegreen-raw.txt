@@ -1,0 +1,90 @@
+service/lab14-bluegreen unchanged
+service/lab14-bluegreen-preview unchanged
+rollout.argoproj.io/lab14-bluegreen configured
+rollout "lab14-bluegreen" image updated
+Name:            lab14-bluegreen
+Namespace:       lab14
+Status:          [94m◌[0m Progressing
+Message:         more replicas need to be updated
+Strategy:        BlueGreen
+Images:          argoproj/rollouts-demo:blue ([32mstable[0m, [32mactive[0m)
+Replicas:
+  Desired:       4
+  Current:       4
+  Updated:       0
+  Ready:         4
+  Available:     4
+
+NAME                                        KIND        STATUS         AGE    INFO
+⟳ lab14-bluegreen                           Rollout     [94m◌[0m Progressing  5m11s  
+├──# revision:4                                                               
+│  └──⧉ [94mlab14-bluegreen-554494b[0m             ReplicaSet  [94m◌[0m Progressing  5m11s  [94mpreview[0m
+│     ├──□ lab14-bluegreen-554494b-5sdck    Pod         [94m◌[0m Pending      0s     ready:0/1
+│     ├──□ lab14-bluegreen-554494b-d7s8r    Pod         [94m◌[0m Pending      0s     ready:0/1
+│     └──□ lab14-bluegreen-554494b-jdsvq    Pod         [94m◌[0m Pending      0s     ready:0/1
+└──# revision:3                                                               
+   └──⧉ [32m[32mlab14-bluegreen-b6f849578[0m[0m           ReplicaSet  [32m✔[0m Healthy      5m11s  [32mstable[0m,[32mactive[0m
+      ├──□ lab14-bluegreen-b6f849578-67ldk  Pod         [32m✔[0m Running      5m11s  ready:1/1
+      ├──□ lab14-bluegreen-b6f849578-nxvrx  Pod         [32m✔[0m Running      5m11s  ready:1/1
+      ├──□ lab14-bluegreen-b6f849578-qw5mj  Pod         [32m✔[0m Running      5m11s  ready:1/1
+      └──□ lab14-bluegreen-b6f849578-vx9dv  Pod         [32m✔[0m Running      5m11s  ready:1/1
+NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+lab14-bluegreen           ClusterIP   10.96.104.207   <none>        80/TCP    5m12s
+lab14-bluegreen-preview   ClusterIP   10.96.117.163   <none>        80/TCP    5m12s
+rollout 'lab14-bluegreen' promoted
+Name:            lab14-bluegreen
+Namespace:       lab14
+Status:          [94m◌[0m Progressing
+Message:         active service cutover pending
+Strategy:        BlueGreen
+Images:          argoproj/rollouts-demo:blue ([32mstable[0m, [32mactive[0m)
+                 argoproj/rollouts-demo:yellow ([94mpreview[0m)
+Replicas:
+  Desired:       4
+  Current:       8
+  Updated:       4
+  Ready:         4
+  Available:     4
+
+NAME                                        KIND        STATUS               AGE    INFO
+⟳ lab14-bluegreen                           Rollout     [94m◌[0m Progressing        5m12s  
+├──# revision:4                                                                     
+│  └──⧉ [94mlab14-bluegreen-554494b[0m             ReplicaSet  [94m◌[0m Progressing        5m12s  [94mpreview[0m
+│     ├──□ lab14-bluegreen-554494b-5sdck    Pod         [94m◌[0m ContainerCreating  1s     ready:0/1
+│     ├──□ lab14-bluegreen-554494b-d7s8r    Pod         [94m◌[0m ContainerCreating  1s     ready:0/1
+│     ├──□ lab14-bluegreen-554494b-jdsvq    Pod         [94m◌[0m ContainerCreating  1s     ready:0/1
+│     └──□ lab14-bluegreen-554494b-vtlpq    Pod         [94m◌[0m ContainerCreating  1s     ready:0/1
+└──# revision:3                                                                     
+   └──⧉ [32m[32mlab14-bluegreen-b6f849578[0m[0m           ReplicaSet  [32m✔[0m Healthy            5m12s  [32mstable[0m,[32mactive[0m
+      ├──□ lab14-bluegreen-b6f849578-67ldk  Pod         [32m✔[0m Running            5m12s  ready:1/1
+      ├──□ lab14-bluegreen-b6f849578-nxvrx  Pod         [32m✔[0m Running            5m12s  ready:1/1
+      ├──□ lab14-bluegreen-b6f849578-qw5mj  Pod         [32m✔[0m Running            5m12s  ready:1/1
+      └──□ lab14-bluegreen-b6f849578-vx9dv  Pod         [32m✔[0m Running            5m12s  ready:1/1
+rollout 'lab14-bluegreen' undo
+Name:            lab14-bluegreen
+Namespace:       lab14
+Status:          [32m✔[0m Healthy
+Strategy:        BlueGreen
+Images:          argoproj/rollouts-demo:blue ([32mstable[0m, [32mactive[0m)
+                 argoproj/rollouts-demo:yellow
+Replicas:
+  Desired:       4
+  Current:       8
+  Updated:       4
+  Ready:         4
+  Available:     4
+
+NAME                                        KIND        STATUS               AGE    INFO
+⟳ lab14-bluegreen                           Rollout     [32m✔[0m Healthy            5m12s  
+├──# revision:5                                                                     
+│  └──⧉ [32m[32mlab14-bluegreen-b6f849578[0m[0m           ReplicaSet  [32m✔[0m Healthy            5m12s  [32mstable[0m,[32mactive[0m
+│     ├──□ lab14-bluegreen-b6f849578-67ldk  Pod         [32m✔[0m Running            5m12s  ready:1/1
+│     ├──□ lab14-bluegreen-b6f849578-nxvrx  Pod         [32m✔[0m Running            5m12s  ready:1/1
+│     ├──□ lab14-bluegreen-b6f849578-qw5mj  Pod         [32m✔[0m Running            5m12s  ready:1/1
+│     └──□ lab14-bluegreen-b6f849578-vx9dv  Pod         [32m✔[0m Running            5m12s  ready:1/1
+└──# revision:4                                                                     
+   └──⧉ lab14-bluegreen-554494b             ReplicaSet  [94m◌[0m Progressing        5m12s  delay:29s
+      ├──□ lab14-bluegreen-554494b-5sdck    Pod         [94m◌[0m ContainerCreating  1s     ready:0/1
+      ├──□ lab14-bluegreen-554494b-d7s8r    Pod         [94m◌[0m ContainerCreating  1s     ready:0/1
+      ├──□ lab14-bluegreen-554494b-jdsvq    Pod         [94m◌[0m ContainerCreating  1s     ready:0/1
+      └──□ lab14-bluegreen-554494b-vtlpq    Pod         [94m◌[0m ContainerCreating  1s     ready:0/1
